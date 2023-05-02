@@ -12,6 +12,7 @@ namespace CYRLibrary
         public int BonusHitChance { get; set; }
         public int BonusBlock { get; set; }
         public int BonusToughness { get; set; }
+        public int HandsUsed { get; set; }
 
 
 
@@ -21,6 +22,7 @@ namespace CYRLibrary
             BonusBlock = bonusBlock;
             BonusToughness = bonusToughness;
             Location = location;
+            HandsUsed = 1;
 
         }
 
