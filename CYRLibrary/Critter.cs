@@ -8,18 +8,15 @@ namespace CYRLibrary
 {
     public sealed class Critter : Monster
     {
-        public int GrossOutFactor { get; set; }
+        
 
         public Critter(string name, int maxLife, int hitChance, int block, int toughness, int maxDamage, int minDamage, string monDescrip) : base(name, maxLife, hitChance, block, toughness, maxDamage, minDamage, monDescrip)
         {
            
         }
 
-        public Critter()
-        {
-            Name = "Swarm of Roaches";
-
-        }
+        public Critter() : base("Swarm of Roaches", 10, 50, 0, 5, 8, 1, "This is a swarm of unusally large roaches") { }
+        
 
       
         
