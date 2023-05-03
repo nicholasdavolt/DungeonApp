@@ -34,6 +34,8 @@ namespace CYRLibrary
                 throw new ArgumentException("Min Damage must be between zero and Max Damage");
             }
         }
+
+
         public override string ToString()
         {
         return base.ToString() + $"Damage Range: {MinDamage} - {MaxDamage}\n" +
