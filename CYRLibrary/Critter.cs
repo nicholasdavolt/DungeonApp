@@ -10,12 +10,12 @@ namespace CYRLibrary
     {
         
 
-        public Critter(string name, int maxLife, int hitChance, int block, int toughness, int maxDamage, int minDamage, string monDescrip) : base(name, maxLife, hitChance, block, toughness, maxDamage, minDamage, monDescrip)
+        public Critter(string name, int maxLife, int hitChance, int block, int toughness, int maxDamage, int minDamage, string monDescrip, MonsterType monsterType) : base(name, maxLife, hitChance, block, toughness, maxDamage, minDamage, monDescrip, monsterType)
         {
            
         }
 
-        public Critter() : base("Swarm of Roaches", 10, 50, 0, 5, 8, 1, "This is a swarm of unusally large roaches") { }
+        public Critter() : base("Swarm of Roaches", 10, 50, 0, 5, 8, 1, "This is a swarm of unusally large roaches", MonsterType.Critter) { }
         
 
       

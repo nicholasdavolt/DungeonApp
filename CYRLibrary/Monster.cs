@@ -15,6 +15,8 @@ namespace CYRLibrary
         public int MaxDamage { get; set; }
         public string MonDescrip { get; set; }
 
+        public MonsterType MonsterType { get; set; }
+
         public int MinDamage
         {
             get { return _minDamage; }
@@ -23,7 +25,7 @@ namespace CYRLibrary
 
         }
 
-        public Monster(string name, int maxLife, int hitChance, int block, int toughness, int maxDamage, int minDamage, string monDescrip) : base(name, maxLife, hitChance, block, toughness)
+        public Monster(string name, int maxLife, int hitChance, int block, int toughness, int maxDamage, int minDamage, string monDescrip, MonsterType monsterType) : base(name, maxLife, hitChance, block, toughness)
         {
             MonDescrip = monDescrip;
             MaxDamage = maxDamage;
@@ -33,6 +35,7 @@ namespace CYRLibrary
             {
                 throw new ArgumentException("Min Damage must be between zero and Max Damage");
             }
+            MonsterType = monsterType;
         }
 
 
