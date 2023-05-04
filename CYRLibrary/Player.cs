@@ -12,19 +12,19 @@ namespace CYRLibrary
         private  int _availableHands;
 
         public Major PlayerMajor { get; set; }
-        public Weapon EquippedWeapon { get; set; }
+        public Item EquippedWeapon { get; set; }
 
         public int BonusDamage { get; set; }
 
         public int AvailableHands { get; set; }
 
-        public Equipment_Body EquippedBody { get; set; }
+        public Item EquippedBody { get; set; }
 
-        public Equipment_Head EquippedHead { get; set; }
+        public Item EquippedHead { get; set; }
 
-        public Equipment_Hands EquippedHands { get; set; }
+        public Item EquippedHands { get; set; }
 
-        public Player(string name, int maxLife, int hitChance, int block, int toughness, Major playerMajor, Weapon equippedWeapon) : base(name, maxLife, hitChance, block, toughness)
+        public Player(string name, int maxLife, int hitChance, int block, int toughness, Major playerMajor, Item equippedWeapon) : base(name, maxLife, hitChance, block, toughness)
         {
             PlayerMajor = playerMajor;
             EquippedWeapon = equippedWeapon;
@@ -95,14 +95,7 @@ namespace CYRLibrary
             return base.CalcHitChance() + EquippedWeapon.BonusHitChance;
         }
 
-        public bool EnoughHandsCheck()
-        {
-            if ((EquippedWeapon.HandSlots + EquippedHands.HandsUsed) < AvailableHands)
-            {
-                return true;
-            }
-            return false;
-        }
+      
 
 
     }

@@ -18,7 +18,18 @@ namespace CYRLibrary
             if (hitRoll == 100)
             {
                 int damage = attacker.CalcDamage();
-                attacker.CurrentLife -= damage - attacker.Toughness;
+
+                if (damage - attacker.Toughness < 0)
+                {
+                    damage = 0;
+                }
+
+                else
+                {
+                    damage -= attacker.Toughness;
+                }
+
+                attacker.CurrentLife -= damage;
 
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"CRITICAL MISS! {attacker.Name} has damaged themselves for {damage} damage!");
@@ -27,7 +38,16 @@ namespace CYRLibrary
             else if (hitRoll <= 10)
             {
                 int damage = attacker.CalcDamage() * 2;
-                defender.CurrentLife -= damage - defender.Toughness;
+
+                if (damage - defender.Toughness < 0)
+                {
+                    damage = 0;
+                }
+                else
+                {
+                    damage -= defender.Toughness;
+                }
+                defender.CurrentLife -= damage;
 
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"CRITICAL HIT!!!{attacker.Name} hit {defender.Name} for {damage} damage!");
@@ -36,8 +56,17 @@ namespace CYRLibrary
             }
             else if (hitRoll <= chance)
             {
+
                 int damage = attacker.CalcDamage();
-                defender.CurrentLife -= damage - defender.Toughness;
+                if (damage - defender.Toughness < 0)
+                {
+                    damage = 0;
+                }
+                else
+                {
+                    damage -= defender.Toughness;
+                }
+                defender.CurrentLife -= damage;
 
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"{attacker.Name} hit {defender.Name} for {damage} damage!");
