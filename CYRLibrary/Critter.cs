@@ -15,7 +15,7 @@ namespace CYRLibrary
            
         }
 
-        public Critter() : base("Swarm of Roaches", 10, 50, 0, 5, 8, 1, "This is a swarm of unusally large roaches", MonsterType.Critter) { }
+        public Critter() : base("Swarm of Roaches", 1, 50, 0, 0, 2, 1, "This is a swarm of unusally large roaches", MonsterType.Critter) { }
         
 
       
