@@ -19,14 +19,14 @@ namespace CYRLibrary
             {
                 int damage = attacker.CalcDamage();
 
-                if (damage - attacker.Toughness < 0)
+                if (damage - attacker.CalcToughness() < 0)
                 {
                     damage = 0;
                 }
 
                 else
                 {
-                    damage -= attacker.Toughness;
+                    damage -= attacker.CalcToughness();
                 }
 
                 attacker.CurrentLife -= damage;
@@ -35,17 +35,17 @@ namespace CYRLibrary
                 Console.WriteLine($"CRITICAL MISS! {attacker.Name} has damaged themselves for {damage} damage!");
                 Console.ResetColor();
             }
-            else if (hitRoll <= 10)
+            else if (hitRoll <= 5)
             {
                 int damage = attacker.CalcDamage() * 2;
 
-                if (damage - defender.Toughness < 0)
+                if (damage - defender.CalcToughness() < 0)
                 {
                     damage = 0;
                 }
                 else
                 {
-                    damage -= defender.Toughness;
+                    damage -= defender.CalcToughness();
                 }
                 defender.CurrentLife -= damage;
 
@@ -58,13 +58,13 @@ namespace CYRLibrary
             {
 
                 int damage = attacker.CalcDamage();
-                if (damage - defender.Toughness < 0)
+                if (damage - defender.CalcToughness() < 0)
                 {
                     damage = 0;
                 }
                 else
                 {
-                    damage -= defender.Toughness;
+                    damage -= defender.CalcToughness();
                 }
                 defender.CurrentLife -= damage;
 
@@ -87,6 +87,7 @@ namespace CYRLibrary
 
             if(monster.MaxLife > 0)
             {
+
                 DoAttack(monster, player);
             }
         }

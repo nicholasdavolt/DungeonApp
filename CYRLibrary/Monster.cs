@@ -38,6 +38,8 @@ namespace CYRLibrary
             MonsterType = monsterType;
         }
 
+        public Monster() { }
+
 
         public override string ToString()
         {
@@ -48,5 +50,7 @@ namespace CYRLibrary
         {
             return new Random().Next(MinDamage, MaxDamage + 1);
         }
+
+        
     }  
 }

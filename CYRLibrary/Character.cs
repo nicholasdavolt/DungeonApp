@@ -44,5 +44,9 @@
         {
             return HitChance;
         }
+        public virtual int CalcToughness()
+        {
+            return Toughness;
+        }
     }
 }
