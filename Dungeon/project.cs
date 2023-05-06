@@ -41,6 +41,8 @@ jgs |           __    ___   |
             #endregion
 
             #region Player Creation
+
+            //Collects player input to create the starting character
             Console.WriteLine("What is your name?");
             string playerName = Console.ReadLine();
             Console.WriteLine($"What is your major?\n" +
@@ -70,30 +72,31 @@ jgs |           __    ___   |
                     Console.WriteLine("Please pick a valid major");
                     break;
             }
-            Item broom = new Item("Broom",false,"Your trusty broom",50,10,1,49,0,0,0,EquipLocations.hands,true);
-            Player player = new(playerName, 500, 100, 100, 100, playerMajor, broom);
+            //defines and initialized the starting weapon and character
+            Item broom = new Item("Broom",false,"Your trusty broom",8,10,1,1,0,0,0,EquipLocations.hands,true);
+            Player player = new(playerName, 50, 50, 5, 3, playerMajor, broom);
             Console.Clear ();
             Console.WriteLine("Here is your character:");
             Console.WriteLine(player);
-            Console.WriteLine("Press any key to begin your adventure.");
+            Console.WriteLine("Press any key to begin your adventure. Be wary of how gross these rooms can be. Just being in them can hurt you.");
             Console.ReadKey();
             Console.Clear();
             #endregion
 
             int score = 0;
             bool mainLoop = true; //counter for the main game loop
-            List<Item> inventory = new List<Item>();
+            List<Item> inventory = new List<Item>();//creates list to be used for the player inventory
 
 
             do
             {
                 Random rand = new Random();
-                int grossOut = rand.Next(1, 4);
+                int grossOut = rand.Next(0, 4);//assigns rooms gross out factor
                 Monster monster;
                 if (score < 12)
                 {
-                    Console.WriteLine(GetRoom(score));
-                    monster = GetMonster(score);
+                    Console.WriteLine(GetRoom(score));//returns a room based on score, or randomly past a score value of 12
+                    monster = GetMonster(score);//returns a monster based on the current player score
 
                     Console.WriteLine($"There is a {monster.Name} here.");
                 }
@@ -106,8 +109,9 @@ jgs |           __    ___   |
 
                     Console.WriteLine($"There is a {monster.Name} here.");
                 }
-                inventory.Add(GetItem());
-                Console.WriteLine(inventory[inventory.Count-1]);
+                
+
+                
 
 
                 bool innerMenu = true; //counter for inner menu
@@ -127,9 +131,10 @@ jgs |           __    ___   |
 
                     switch (choice)
                     {
-                        case ConsoleKey.A:
+                        case ConsoleKey.A: //handles one round of combat if the monster health is less than zero it resets the inner menu loop, getting a new room, monster and item
                             Combat.DoBattle(player, monster);
                             player.CurrentLife -= grossOut;
+                            
 
                             if (monster.CurrentLife <= 0)
                             {
@@ -138,55 +143,198 @@ jgs |           __    ___   |
                                 innerMenu = false;
                                 score++;
                                 Console.ResetColor();
+                                if (inventory.Count >= 10)
+                                {
+                                    Console.WriteLine("Your inventory is full, and you cannot find any more items.");
+                                }
+                                else
+                                {
+                                    inventory.Add(GetItem());
+                                    Console.WriteLine($"You have found a {inventory[inventory.Count - 1]}");
+                                }
 
                             }
                             break;
-                        case ConsoleKey.R:
+                        case ConsoleKey.R://retreats from the current room. lowers score by 1 and does an attack of opportunity.
                             Console.WriteLine("Run Away");
                             Combat.DoAttack(monster, player);
                             innerMenu = false;
                             score--;
                             break;
-                        case ConsoleKey.C:
+                        case ConsoleKey.C://diplays player character info
                             Console.WriteLine("Player Info");
                             Console.WriteLine(player);
                             Console.WriteLine($"Current Score: {score}");
                             
                             break;
-                        case ConsoleKey.M:
+                        case ConsoleKey.M://displays current monster info
                             Console.WriteLine("Opponent Info");
                             Console.WriteLine(monster);
                             break;
-                        case ConsoleKey.I:
+                        case ConsoleKey.I: //starts sub loops allowing for viewing and use of items in the inventory list.                        
                             bool inv = true;
                             while (inv)
                             {
-                               var invView = from i in inventory
-                                             orderby i.IsConsumable descending
-                                             orderby i.IsWeapon descending
-                                             select i;
-                                foreach (var i in invView)
+                                int invCount = inventory.Count - 1;
+                                bool innerInv = true;
+                                while (innerInv)
                                 {
-                                    Console.WriteLine($"{inventory.IndexOf(i)+1}.\tName: {i.Name}\tDescription: {i.Description}");
-                                }
-                                Console.Write("Press E to exit\n");
-                                choice = Console.ReadKey(true).Key;
-                                switch (choice)
-                                {
-                                    case ConsoleKey.E:
+                                    
+                                    if (inventory.Count == 0)
+                                    {
+                                        Console.WriteLine("Your inventory is empty! Go out and find some stuff. Press any key to return to the action.");
+                                        Console.ReadKey(true);
+                                        innerInv = false;
                                         inv = false;
                                         Console.Clear();
                                         break;
-                                    default: Console.WriteLine("Select a valid choice\n");
-                                        break;
-                                }
+                                    }
+                                    
+                                    Item invItem = inventory[invCount];
+                                    Console.WriteLine($"You have a {invItem.Name}! {invItem.Description}\n" +
+                                        $"P. Previous Item\tN. Next Item\tU. Use Item\tR. Remove Item\tE. Exit");
+                                    choice = Console.ReadKey(true).Key;
+                                    switch (choice)
+                                    {
+                                        case ConsoleKey.P:
+                                            if (invCount == 0)
+                                            {
+                                                invCount = inventory.Count-1;
+                                            }
+                                            else
+                                            {
+                                                invCount--;
+                                            }
+                                            break;
+                                        case ConsoleKey.N:
+                                            if (invCount == inventory.Count - 1)
+                                            {
+                                                invCount = 0;
+                                            }
+                                            else
+                                            {
+                                                invCount++;
+                                            }
+                                            break;
+                                        case ConsoleKey.U:
+                                            if (invItem.IsConsumable == true)
+                                            {
+                                                if (invItem.AmountHealed + player.CurrentLife > player.MaxLife)
+                                                {
+                                                    player.CurrentLife = player.MaxLife;
+                                                    inventory.RemoveAt(invCount);
+                                                    invCount --;
+                                                    Console.WriteLine("You feel rejuvinated, and are back to your max health");
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    player.CurrentLife += invItem.AmountHealed;
+                                                    inventory.RemoveAt(invCount);
+                                                    Console.WriteLine($"You have healed {invItem.AmountHealed} health. Tour current health is {player.CurrentLife} of {player.MaxLife}");
+                                                    invCount--;
+                                                    break;
+                                                }
+                                                
+
+                                            }
+                                            else if (invItem.IsWeapon)
+                                            {
+                                                Console.WriteLine($"You have unequipped {player.EquippedWeapon.Name} and equpped {invItem.Name}");
+                                                inventory.Add(player.EquippedWeapon);
+                                                player.EquippedWeapon = invItem;
+                                                inventory.RemoveAt(invCount);
+                                                break;
+
+                                            }
+                                            else if (invItem.Location == EquipLocations.head)
+                                            {
+                                                if (player.EquippedHead == null)
+                                                {
+                                                    Console.WriteLine($"You have equipped {invItem.Name}");
+                                                    player.EquippedHead = invItem;
+                                                    inventory.RemoveAt(invCount);
+                                                    invCount--;
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine($"You have unequipped {player.EquippedHead.Name} and equipped {invItem.Name}");
+                                                    inventory.Add(player.EquippedHead);
+                                                    player.EquippedHead = invItem;
+                                                    inventory.RemoveAt(invCount);
+                                                    break;
+                                                }
+
+                                            }
+                                            else if (invItem.Location == EquipLocations.body)
+                                            {
+                                                if (player.EquippedBody == null)
+                                                {
+                                                    Console.WriteLine($"You have equipped {invItem.Name}");
+                                                    player.EquippedBody = invItem;
+                                                    inventory.RemoveAt(invCount);
+                                                    invCount--;
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine($"You have unequipped {player.EquippedBody.Name} and equipped {invItem.Name}");
+                                                    inventory.Add(player.EquippedBody);
+                                                    player.EquippedBody = invItem;
+                                                    inventory.RemoveAt(invCount);
+                                                    break;
+
+                                                }
+                                            }
+                                            else if (invItem.Location == EquipLocations.hands)
+                                            {
+
+                                                if (player.EquippedWeapon.HandSlots >= player.AvailableHands)
+                                                {
+                                                    Console.WriteLine("Not enough hands!! Maybe pick a smaller weapon!");
+                                                }
+                                                else if (player.EquippedHands == null)
+                                                {
+                                                    Console.WriteLine($"You have equipped {invItem.Name}");
+                                                    player.EquippedHands = invItem;
+                                                    inventory.RemoveAt(invCount);
+                                                    invCount--;
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine($"You have unequipped {player.EquippedHands.Name} and equipped {invItem.Name}");
+                                                    inventory.Add(player.EquippedHands);
+                                                    player.EquippedHands = invItem;
+                                                    inventory.RemoveAt(invCount);
+                                                    break;
+                                                }
+                                            }
+                                            break;
+                                        case ConsoleKey.R:
+                                            inventory.RemoveAt(invCount);
+                                            break;
+                                        case ConsoleKey.E:
+                                        case ConsoleKey.Escape:
+                                            innerInv = false;
+                                            inv = false;
+                                            break;
+
+                                    }
 
 
-                            }
+
+
+
+
+
+
+                                };
+                            };
+                            Console.Clear();
                             break;
-
-
-                        case ConsoleKey.Escape:
+                        case ConsoleKey.Escape://ends the game
                         case ConsoleKey.E:
                             Console.WriteLine("Thanks for playing!");
                             mainLoop=false;
@@ -197,7 +345,7 @@ jgs |           __    ___   |
                             break;
                     }
 
-                    if (player.CurrentLife <= 0)
+                    if (player.CurrentLife <= 0)//ends the game if player life is at 0 or below
                     {
                         Console.WriteLine("As you have your final breaths, your only regret is that you spent your last moments cleaning the house.");
                         mainLoop = false;
@@ -206,7 +354,7 @@ jgs |           __    ___   |
             } while (mainLoop);
             Console.WriteLine($"Final Score: {score}");
         }
-        private static string GetRoom(int score)
+        private static string GetRoom(int score)//returns a room based on score, or randomly
         {
             List<string> rooms = new List<string>()
             {
@@ -236,16 +384,16 @@ jgs |           __    ___   |
             }
 
         }
-        private static  Monster GetMonster(int score)
+        private static  Monster GetMonster(int score)//returns monster. Uses score to deliver random monsters of a specific tier, or specific monsters for the first time encountering certain rooms.
         {
             Critter m1 = new();
             Construction m2 = new();
             Abberation m3 = new();
             Roommate m4 = new();
-            Roommate geof = new("GEOF THE TECHNO VIKING", 60, 60, 10, 5, 10, 5, "This is your roomate Geof. His extreme height causes and horned helmet is currently putting holes in the ceiling.", MonsterType.Roommate);
-            Roommate nate = new("NATHAN THE PIZZA MAN",70,65,15,6,12,6,"Your roommate has somehow turned himslef into a literal pizza man. Or is it a man pizza?",MonsterType.Roommate);
-            Roommate russ = new("RUSS THE FARMER OF DESPAIR",80,70,20,8,15,5,"This roommate appears jovial, with his big beard and overalls. You can just make out the head of cabbage he is reading to chuck at your head.",MonsterType.Roommate);
-            Roommate keno = new("Kenny, just Kenny", 120, 70, 20, 10, 15, 5, "Kenny appears to be a normal guy, but I hear he once fought 5 guys and their girlfriend... and won.", MonsterType.Roommate);
+            Roommate geof = new("GEOF THE TECHNO VIKING", 60, 50, 5, 5, 10, 5, "This is your roomate Geof. His extreme height combined with his horned helmet is currently putting holes in the ceiling.", MonsterType.Roommate,true);
+            Roommate nate = new("NATHAN THE PIZZA MAN",70,55,5,6,12,6,"Your roommate has somehow turned himslef into a literal pizza man. Or is it a man pizza?",MonsterType.Roommate,true);
+            Roommate russ = new("RUSS THE FARMER OF DESPAIR",80,60,10,5,15,5,"This roommate appears jovial, with his big beard and overalls. You can just make out the head of cabbage he is reading to chuck at your head.",MonsterType.Roommate, true);
+            Roommate keno = new("Kenny, just Kenny", 120, 70, 10, 5, 15, 5, "Kenny appears to be a normal guy, but I hear he once fought 5 guys and their girlfriend... and won.", MonsterType.Roommate, true);
 
 
             List<Monster> monReturnEarly = new List<Monster>()
@@ -379,19 +527,19 @@ jgs |           __    ___   |
 
         }
 
-        private static Item GetItem()
+        private static Item GetItem() //returns random item
         {
-            Item cleaner = new Item("Spray bottle of cleaner",false,"A spray bottle full of a bleach based cleaner",8,15,1,1,0,0,0,EquipLocations.hands,false);
-            Item vacuum = new Item("Vacuum", false, "A portable backpack based vacuum", 12, 5, 2, 1, 0, 0 , 0, EquipLocations.hands,false);
-            Item studyBudy = new Item("Study Budy", false,"An overly helpfull member of your study group", 10,10,0,1,0,0,0,EquipLocations.hands,true);
-            Item bikeHelmet = new Item("Bicycle Helmet", false, "This old helmet should give your noggin some protection", 0, 0, 0, 0, 0, 5, 3, EquipLocations.head, false);
-            Item armorHelmet = new Item("Plate Helmet",false,"This helmet was presumably stolen from the history department",0,0,0,0,0,10,6,EquipLocations.head,false);
-            Item larpArmor = new Item ("Plastic Armor",false,"This plastic breastplate is leftover from someone's LARPing days",0,0,0,0,0,5,3,EquipLocations.body,false);
-            Item cookieSheet = new Item("A Cookie Sheet", false, "A suprising amount of protection is afforded by stuffing a cookie sheet down your shirt", 0, 0, 0, 0, 0, 10, 6, EquipLocations.body, false);
-            Item trashLid = new Item("Trash can lid", false,"Nothing beats using a trash can lid as a shield",0,0,1,0,0,10,0,EquipLocations.hands,false);
-            Item pwrGlove = new Item("A Nintendo Power Glove", false, "You have wanted one of these since you first saw The Wizard", 0, 20, 1, 0, 0, 20, 0, EquipLocations.hands, false);
-            Item sportsDrink = new Item("Sports Drink",true,"Gotta love that Hatorade",0,0,0,0,15,0,0,EquipLocations.hands,false);
-            Item alcohol = new Item("Alcohol",true,"Some cheap booze usually fixes you right up",0,0,0,0,30,0,0,EquipLocations.hands,false);
+            Item cleaner = new Item("Spray bottle of cleaner",false,"A spray bottle full of a bleach based cleaner that can be used as a weapon.",8,15,1,1,0,0,0,EquipLocations.hands,false);
+            Item vacuum = new Item("Vacuum", false, "A portable backpack based vacuum that can be used as a weapon.", 12, 5, 2, 1, 0, 0 , 0, EquipLocations.hands,false);
+            Item studyBudy = new Item("Study Budy", false,"An overly helpfull member of your study group that will fight for you.", 10,10,0,1,0,0,0,EquipLocations.hands,true);
+            Item bikeHelmet = new Item("Bicycle Helmet", false, "This old helmet should give your noggin some protection.", 0, 0, 0, 0, 0, 5, 3, EquipLocations.head, false);
+            Item armorHelmet = new Item("Plate Helmet",false,"This helmet was presumably stolen from the history department.",0,0,0,0,0,10,6,EquipLocations.head,false);
+            Item larpArmor = new Item ("Plastic Armor",false,"This plastic breastplate is leftover from someone's LARPing days.",0,0,0,0,0,5,3,EquipLocations.body,false);
+            Item cookieSheet = new Item("A Cookie Sheet", false, "A suprising amount of protection is afforded by stuffing a cookie sheet down your shirt.", 0, 0, 0, 0, 0, 10, 6, EquipLocations.body, false);
+            Item trashLid = new Item("Trash can lid", false,"Nothing beats using a trash can lid as a shield.",0,0,1,0,0,10,0,EquipLocations.hands,false);
+            Item pwrGlove = new Item("A Nintendo Power Glove", false, "You have wanted one of these since you first saw The Wizard.", 0, 20, 1, 0, 0, 20, 0, EquipLocations.hands, false);
+            Item sportsDrink = new Item("Sports Drink",true,"Gotta love that Hatorade.",0,0,0,0,15,0,0,EquipLocations.hands,false);
+            Item alcohol = new Item("Alcohol",true,"Some cheap booze usually fixes you right up.",0,0,0,0,30,0,0,EquipLocations.hands,false);
 
             Random rand = new Random();
             List<Item> items = new List<Item>()

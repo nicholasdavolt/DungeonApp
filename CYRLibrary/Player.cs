@@ -24,6 +24,8 @@ namespace CYRLibrary
 
         public Item EquippedHands { get; set; }
 
+       
+
         public Player(string name, int maxLife, int hitChance, int block, int toughness, Major playerMajor, Item equippedWeapon) : base(name, maxLife, hitChance, block, toughness)
         {
             PlayerMajor = playerMajor;
@@ -82,7 +84,7 @@ namespace CYRLibrary
             return base.ToString() + $"Weapon: {EquippedWeapon.Name}\n" +
                 $"Bonus Hit Chance: {EquippedWeapon.BonusHitChance}\n" +
                 $"Weapon Damage: {EquippedWeapon.MinDamage} - {EquippedWeapon.MaxDamage}\n" +
-                $"Descriptiong:\n{majorDescription}\n";
+                $"Description:\n{majorDescription}\n";
         }
 
         public override int CalcDamage()
@@ -92,10 +94,28 @@ namespace CYRLibrary
 
         public override int CalcHitChance()
         {
-            return base.CalcHitChance() + EquippedWeapon.BonusHitChance;
+            int bonusBodyChance = (EquippedBody == null ? 0 : EquippedBody.BonusHitChance);
+            int bonusHeadChance = (EquippedHead == null ? 0 : EquippedHead.BonusHitChance);
+            int bonusHandsChance = (EquippedHands == null ? 0 : EquippedHands.BonusHitChance);
+            int bonusWeaponChance = (EquippedWeapon == null ? 0 : EquippedWeapon.BonusHitChance);
+
+
+            return base.CalcHitChance() + bonusBodyChance + bonusHandsChance + bonusHandsChance + bonusWeaponChance;
         }
 
-      
+        public override int CalcBlock()
+        {
+            
+            return base.CalcBlock() + (EquippedBody == null ? 0 : EquippedBody.BonusBlock) + (EquippedHead == null ? 0 : EquippedHead.BonusBlock) + (EquippedHands == null ? 0 : EquippedHands.BonusBlock);
+
+        }
+
+        public override int CalcToughness()
+        {
+            return base.CalcToughness() + (EquippedBody == null ? 0 : EquippedBody.BonusToughness) + (EquippedHead == null ? 0 : EquippedHead.BonusToughness) + (EquippedHands == null ? 0 : EquippedHands.BonusToughness); ;
+        }
+
+
 
 
     }

@@ -75,7 +75,8 @@ namespace CYRLibrary
 
         public override string ToString()
         {
-            return $"Name: {Name}\n";
+            return $"{Name}";
         }
+
     }
 }
